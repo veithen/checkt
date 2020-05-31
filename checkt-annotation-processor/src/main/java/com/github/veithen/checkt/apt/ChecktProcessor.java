@@ -26,8 +26,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Processor;
@@ -49,6 +51,17 @@ import com.google.auto.service.AutoService;
 @AutoService(Processor.class)
 public class ChecktProcessor extends AbstractProcessor {
     private static final String TYPE_TOKEN_ANNOTATION_NAME = "com.github.veithen.checkt.annotation.TypeToken";
+
+    static String getTokenName(ExecutableElement method, boolean lowerCase) {
+        String name = method.getSimpleName().toString();
+        if (name.startsWith("get")) {
+            name = name.substring(3);
+        }
+        if (lowerCase) {
+            name = name.substring(0, 1).toLowerCase(Locale.ENGLISH) + name.substring(1);
+        }
+        return name;
+    }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
@@ -77,11 +90,11 @@ public class ChecktProcessor extends AbstractProcessor {
                         }
                         out.println("final class SafeCast {");
                         out.println("    private SafeCast() {}");
-                        out.println();
                         typeLoop: for (Map.Entry<TypeElement,List<ExecutableElement>> typeEntry : packageEntry.getValue().entrySet()) {
                             TypeElement type = typeEntry.getKey();
+                            List<ExecutableElement> methods = typeEntry.getValue();
                             Set<TypeParameterElement> constrainedTypeParameters = new HashSet<>();
-                            for (ExecutableElement method : typeEntry.getValue()) {
+                            for (ExecutableElement method : methods) {
                                 TypeMirror returnType = method.getReturnType();
                                 if (!(returnType instanceof DeclaredType)) {
                                     processingEnv.getMessager().printMessage(Kind.ERROR, "Methods annotated with @TypeToken must return a reference", method);
@@ -100,6 +113,7 @@ public class ChecktProcessor extends AbstractProcessor {
                                     continue typeLoop;
                                 }
                             }
+                            out.println();
                             out.print("    ");
                             if (type.getModifiers().contains(Modifier.PUBLIC)) {
                                 out.print("public ");
@@ -107,67 +121,44 @@ public class ChecktProcessor extends AbstractProcessor {
                             out.print("static <");
                             boolean first = true;
                             for (TypeParameterElement typeParameter : type.getTypeParameters()) {
-                                if (constrainedTypeParameters.contains(typeParameter)) {
-                                    if (first) {
-                                        first = false;
-                                    } else {
-                                        out.print(",");
-                                    }
-                                    out.print(typeParameter);
+                                if (first) {
+                                    first = false;
+                                } else {
+                                    out.print(",");
+                                }
+                                out.print(typeParameter.getSimpleName());
+                                List<? extends TypeMirror> bounds = typeParameter.getBounds();
+                                if (!bounds.isEmpty()) {
+                                    out.print(" extends ");
+                                    out.print(bounds.stream().map(Object::toString).collect(Collectors.joining(" & ")));
                                 }
                             }
                             out.print("> ");
-                            String returnType;
-                            {
-                                StringBuilder buffer = new StringBuilder(type.getSimpleName());
-                                buffer.append("<");
-                                first = true;
-                                for (TypeParameterElement typeParameter : type.getTypeParameters()) {
-                                    if (first) {
-                                        first = false;
-                                    } else {
-                                        buffer.append(",");
-                                    }
-                                    if (constrainedTypeParameters.contains(typeParameter)) {
-                                        buffer.append(typeParameter);
-                                    } else {
-                                        buffer.append("?");
-                                    }
-                                }
-                                buffer.append(">");
-                                returnType = buffer.toString();
-                            }
+                            String returnType = type.getSimpleName() + type.getTypeParameters().stream().map(TypeParameterElement::getSimpleName).collect(Collectors.joining(",", "<", ">"));
                             out.print(returnType);
                             out.print(" cast(");
                             out.print(type.getSimpleName());
                             out.print("<");
-                            for (int i=0; i<type.getTypeParameters().size(); i++) {
-                                if (i>0) {
-                                    out.print(",");
-                                }
-                                out.print("?");
-                            }
+                            out.print(type.getTypeParameters().stream().map(t -> constrainedTypeParameters.contains(t) ? "?" : t.getSimpleName()).collect(Collectors.joining(",")));
                             out.print("> o");
-                            int i = 0;
-                            for (ExecutableElement method : typeEntry.getValue()) {
+                            for (ExecutableElement method : methods) {
                                 out.print(", ");
                                 out.print(method.getReturnType());
-                                out.print(" token");
-                                out.print(++i);
+                                out.print(" ");
+                                out.print(getTokenName(method, true));
                             }
                             out.println(") {");
-                            i = 1;
-                            for (ExecutableElement method : typeEntry.getValue()) {
-                                out.print("        if (token");
-                                out.print(i);
+                            for (ExecutableElement method : methods) {
+                                String tokenName = getTokenName(method, true);
+                                out.print("        if (");
+                                out.print(tokenName);
                                 out.print(" == null || o.");
                                 out.print(method.getSimpleName());
-                                out.print("() != token");
-                                out.print(i);
+                                out.print("() != ");
+                                out.print(tokenName);
                                 out.println(") {");
                                 out.println("            throw new ClassCastException();");
                                 out.println("        }");
-                                i++;
                             }
                             out.print("        return (");
                             out.print(returnType);
