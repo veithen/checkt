@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -76,7 +77,7 @@ public class ChecktProcessor extends AbstractProcessor {
                     ExecutableElement method = (ExecutableElement)element;
                     TypeElement type = (TypeElement)method.getEnclosingElement();
                     PackageElement pkg = (PackageElement)type.getEnclosingElement();
-                    packageMap.computeIfAbsent(pkg, k -> new HashMap<>()).computeIfAbsent(type, k -> new ArrayList<>()).add(method);
+                    packageMap.computeIfAbsent(pkg, k -> new TreeMap<>((o1, o2) -> o1.getSimpleName().toString().compareTo(o2.getSimpleName().toString()))).computeIfAbsent(type, k -> new ArrayList<>()).add(method);
                 }
                 for (Map.Entry<PackageElement,Map<TypeElement,List<ExecutableElement>>> packageEntry : packageMap.entrySet()) {
                     PackageElement pkg = packageEntry.getKey();
