@@ -20,7 +20,6 @@
 package com.github.veithen.checkt.apt;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,7 +31,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -58,9 +56,9 @@ public class ChecktProcessor extends AbstractProcessor {
     private static final String TYPE_TOKEN_ANNOTATION_NAME = "com.github.veithen.checkt.annotation.TypeToken";
     private static final String CONTAINER_ANNOTATION_NAME = "com.github.veithen.checkt.annotation.Container";
 
-    private void writeSource(CharSequence name, Collection<? extends Element> originatingElements, Consumer<PrintWriter> consumer) {
-        try (PrintWriter out = new PrintWriter(processingEnv.getFiler().createSourceFile(name, originatingElements.toArray(new Element[originatingElements.size()])).openWriter())) {
-            consumer.accept(out);
+    private void writeSource(CharSequence name, Collection<? extends Element> originatingElements, SourceProvider sourceProvider) {
+        try (SourceWriter out = new SourceWriter(processingEnv.getFiler().createSourceFile(name, originatingElements.toArray(new Element[originatingElements.size()])).openWriter())) {
+            sourceProvider.writeTo(out);
         } catch (IOException ex) {
             processingEnv.getMessager().printMessage(Kind.ERROR, "Failed to write source file");
         }
@@ -90,7 +88,7 @@ public class ChecktProcessor extends AbstractProcessor {
         return name;
     }
 
-    private void generateCastMethod(PrintWriter out, TypeElement type, List<ExecutableElement> methods, String name) {
+    private void generateCastMethod(SourceWriter out, TypeElement type, List<ExecutableElement> methods, String name) throws IOException {
         Set<TypeParameterElement> constrainedTypeParameters = new HashSet<>();
         for (ExecutableElement method : methods) {
             TypeMirror returnType = method.getReturnType();
