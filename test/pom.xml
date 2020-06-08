@@ -84,7 +84,7 @@
                         </annotationProcessorPath>
                     </annotationProcessorPaths>
                     <fork>true</fork>
-                    <compilerArgs combine.children="append">
+                    <compilerArgs>
                         <compilerArg>-J${compilerArg}</compilerArg>
                     </compilerArgs>
                 </configuration>
