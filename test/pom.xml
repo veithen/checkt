@@ -59,6 +59,21 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>prepare-agent-for-compiler</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <propertyName>compilerArg</propertyName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <annotationProcessorPaths>
@@ -68,6 +83,10 @@
                             <version>${project.version}</version>
                         </annotationProcessorPath>
                     </annotationProcessorPaths>
+                    <fork>true</fork>
+                    <compilerArgs combine.children="append">
+                        <compilerArg>-J${compilerArg}</compilerArg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
         </plugins>
