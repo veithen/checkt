@@ -329,7 +329,7 @@ public class ChecktProcessor extends AbstractProcessor {
                 }
             }
         }
-        return true;
+        return false;
     }
 
     @Override
