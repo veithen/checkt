@@ -29,7 +29,7 @@
 
     <groupId>com.github.veithen.checkt</groupId>
     <artifactId>checkt</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Checkt</name>
@@ -53,13 +53,13 @@
         <url>https://github.com/veithen/checkt/tree/master</url>
         <connection>scm:git:http://github.com/veithen/checkt.git</connection>
         <developerConnection>scm:git:https://github.com/veithen/checkt.git</developerConnection>
-        <tag>0.1.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
         <github.repository>checkt</github.repository>
         <javaVersion>1.8</javaVersion>
-        <project.build.outputTimestamp>2022-04-21T23:26:03Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2022-04-21T23:26:14Z</project.build.outputTimestamp>
     </properties>
 
     <repositories>
