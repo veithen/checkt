@@ -19,7 +19,7 @@
  */
 package com.github.veithen.checkt;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,13 +28,13 @@ public class SafeCastTest {
     public void testPartiallyCastRelation() {
         Relation<?, ?> ref1 = new Relation<String, Integer>(String.class, Integer.class);
         Relation<String, ?> ref2 = SafeCast.castByType1(ref1, String.class);
-        assertThat(ref2).isSameInstanceAs(ref1);
+        assertThat(ref2).isSameAs(ref1);
     }
 
     @Test
     public void testCastSomeClass() {
         SomeClass<?, Integer> ref1 = new SomeClass<String, Integer>(String.class);
         SomeClass<String, Integer> ref2 = SafeCast.cast(ref1, String.class);
-        assertThat(ref2).isSameInstanceAs(ref1);
+        assertThat(ref2).isSameAs(ref1);
     }
 }
