@@ -79,7 +79,6 @@
                 <artifactId>license-maven-plugin</artifactId>
                 <configuration>
                     <projectName>Checkt</projectName>
-                    <licenseName>apache_v2</licenseName>
                 </configuration>
             </plugin>
         </plugins>
