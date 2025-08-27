@@ -29,6 +29,7 @@
 
     <artifactId>checkt-annotations</artifactId>
 
+    <name>Checkt Annotations</name>
     <url>https://github.com/veithen/checkt</url>
 
     <scm>
