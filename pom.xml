@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.github.veithen</groupId>
         <artifactId>parent</artifactId>
-        <version>56</version>
+        <version>57</version>
     </parent>
 
     <groupId>com.github.veithen.checkt</groupId>
@@ -58,7 +58,7 @@
 
     <properties>
         <github.repository>checkt</github.repository>
-        <javaVersion>1.8</javaVersion>
+        <javaVersion>11</javaVersion>
         <project.build.outputTimestamp>2022-04-21T23:26:14Z</project.build.outputTimestamp>
     </properties>
 
