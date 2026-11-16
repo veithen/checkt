@@ -202,12 +202,10 @@ public class ChecktProcessor extends AbstractProcessor {
                     .computeIfAbsent(
                             pkg,
                             k ->
-                                    new TreeMap<>(
-                                            (o1, o2) ->
-                                                    o1.getSimpleName()
-                                                            .toString()
-                                                            .compareTo(
-                                                                    o2.getSimpleName().toString())))
+                                    new TreeMap<>((o1, o2) ->
+                                            o1.getSimpleName()
+                                                    .toString()
+                                                    .compareTo(o2.getSimpleName().toString())))
                     .computeIfAbsent(type, k -> new ArrayList<>())
                     .add(method);
         }
